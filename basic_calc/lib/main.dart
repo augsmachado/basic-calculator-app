@@ -1,57 +1,122 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
+    home: Home(),
+  ));
 }
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+class Home extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    const appTitle = 'Basic Calc';
+  _HomeState createState() => _HomeState();
+}
 
-    return MaterialApp(
-        title: appTitle,
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: Scaffold(
-          appBar: AppBar(
-            title: const Text(appTitle),
-          ),
-          body: const InputNumberForm(),
-        ),
-    );
+class _HomeState extends State<Home> {
+  TextEditingController firstNumberController = TextEditingController();
+  TextEditingController secondNumberController = TextEditingController();
+
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  String _infoText = "Input the numbers";
+
+  void _resetFields(){
+    firstNumberController.text = "";
+    secondNumberController.text = "";
+    setState(() {
+      _infoText = "Input the numbers";
+    });
+
   }
-}
 
-class InputNumberForm extends StatelessWidget {
-  const InputNumberForm({ Key? key }) : super(key: key);
+  void _calculate(){
+    setState(() {
+      double first = double.parse(firstNumberController.text);
+      double second = double.parse(secondNumberController.text);
+      double result = first + second;
+      
+        _infoText = "Result: (${result.toStringAsPrecision(4)})";
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-          child: TextField(
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: 'Enter the first number',
-            ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Basic Calc"),
+        centerTitle: true,
+        backgroundColor: Colors.blue,
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: _resetFields,
+          )
+        ],
+      ),
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Icon(Icons.calculate , size: 120.0, color: Colors.blue),
+              TextFormField(
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                    labelText: "Number 1",
+                    labelStyle: TextStyle(color: Colors.blue)),
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.blue, fontSize: 25.0),
+                controller: firstNumberController,
+                validator: (value) {
+                  if(value!.isEmpty){
+                    return "Input the first value is empty!";
+                  }
+                },
+              ),
+              TextFormField(
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                    labelText: "Number 2",
+                    labelStyle: TextStyle(color: Colors.blue)),
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.blue, fontSize: 25.0),
+                controller: secondNumberController,
+                validator: (value) {
+                  if(value!.isEmpty){
+                    return "Input the second value is empty!";
+                  }
+                },
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 150.0, bottom: 10.0),
+                child: Container(
+                  height: 50.0,
+                  child: RaisedButton(
+                    onPressed: () {
+                      if(_formKey.currentState!.validate()){
+                        _calculate();
+                      }
+                    },
+                    child: Text(
+                      "Calculate",
+                      style: TextStyle(color: Colors.white, fontSize: 25.0),
+                    ),
+                    color: Colors.blue,
+                  ),
+                ),
+              ),
+              Text(
+                _infoText,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.blue, fontSize: 25.0),
+              )
+            ],
           ),
         ),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-          child: TextField(
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: 'Enter the second number',
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
